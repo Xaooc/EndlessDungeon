@@ -12,6 +12,8 @@ Base = declarative_base()
 
 def create_db():
     Base.metadata.create_all(engine)
+    Session()
+
 
 
 class Pers(Base):
@@ -20,7 +22,7 @@ class Pers(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    user_id = Column(Integer)
+    user_id = Column(Integer, ForeignKey("users.id"))
     max_hp = Column(Integer)
     con = Column(Integer)
     con_str = Column(Integer)
@@ -37,7 +39,7 @@ class Pers(Base):
     mnd_wll = Column(Integer)
     mnd_trd = Column(Integer)
     gold = Column(Integer)
-    place = Column(Integer)
+    place = Column(Integer, ForeignKey("place.id"))
     items = Column(String)
     is_dead = Column(Boolean)
 
@@ -78,10 +80,19 @@ class Place(Base):
     desc = Column(String)
     ivent = Column(String)
 
+    def __init__(self, name: str, desc: str, ivent: str):
+        self.name = name
+        self.desc = desc
+        self.ivent = ivent
+
 
 class Users(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
     tg_id = Column(Integer)
-    active_pers = Column(Integer)
+    active_pers = Column(Integer, ForeignKey("pers.id"))
+
+    def __init__(self, tg_id: int, active_pers: int = 0):
+        self.tg_id = tg_id
+        self.active_pers = active_pers

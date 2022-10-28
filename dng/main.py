@@ -1,9 +1,6 @@
 import os
 
-from dng.database import Pers, Users, Place
-
-from dng.database import DATABASE_NAME, Session, create_db
-
+from dng.database import Pers, Users, Place, DATABASE_NAME, Session, create_db
 
 
 if __name__ == "__main__":
