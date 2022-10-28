@@ -8,4 +8,4 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True)
     tg_id = Column(Integer)
-    active_pers = Column(Integer, ForeignKey("pers.id"))
+    active_pers = Column(Integer)

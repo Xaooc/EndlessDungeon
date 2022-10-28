@@ -3,10 +3,13 @@ from sqlalchemy.orm import relationship
 from dng.database import Base
 
 class Pers(Base):
+
     __tablename__ = "pers"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    user_id = Column(Integer)
+    max_hp = Column(Integer)
     con = Column(Integer)
     con_str = Column(Integer)
     con_res = Column(Integer)
@@ -21,17 +24,18 @@ class Pers(Base):
     mnd_prc = Column(Integer)
     mnd_wll = Column(Integer)
     mnd_trd = Column(Integer)
-    place = Column(Integer, ForeignKey("place.id"))
     gold = Column(Integer)
+    place = Column(Integer)
     items = Column(String)
     is_dead = Column(Boolean)
 
-    users = relationship('Users')
-
-    def __init__(self, name: str, con: int, con_str: int, con_res: int, con_dmg: int,
+    def __init__(self, name: str, user_id: int,
+                 max_hp: int, con: int, con_str: int, con_res: int, con_dmg: int,
                  dex: int, dex_crt: int, dex_ac: int, dex_esc: int, dex_lp: int,
                  mnd: int, mnd_mgc: int, mnd_prc: int, mnd_wll: int, mnd_trd: int,
                  gold: int, place: int = 0, items: str = '', is_dead: bool = False):
+        self.user_id = user_id
+        self.max_hp = max_hp
         self.is_dead = is_dead
         self.items = items
         self.gold = gold

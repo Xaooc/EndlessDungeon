@@ -1,10 +1,16 @@
 from random import randint
 
+from dng.pers import Pers
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
 
 class GeneratorPers:
 
-    def __init__(self, name):
+    def __init__(self, name, user_id=0):
         self.name = name
+        self.user_id = user_id
 
         self.exp = 0
 
@@ -18,6 +24,33 @@ class GeneratorPers:
         self.mnd_mgc = self.mnd_prc = self.mnd_wll = self.mnd_trd = (self.mnd - 10) // 2
 
         self.gold = randint(1, 20)
+
+        DATABASE_NAME = 'rpg.sqlite'
+        engine = create_engine(f'sqlite:///{DATABASE_NAME}')
+        session = Session(bind=engine)
+
+        new = Pers(
+            self.name,
+            self.user_id,
+            self.max_hp,
+            self.con,
+            self.con_str,
+            self.con_res,
+            self.con_dmg,
+            self.dex,
+            self.dex_crt,
+            self.dex_ac,
+            self.dex_esc,
+            self.dex_lp,
+            self.mnd,
+            self.mnd_mgc,
+            self.mnd_prc,
+            self.mnd_wll,
+            self.mnd_trd,
+            self.gold
+        )
+        session.add(new)
+        session.commit()
 
     @staticmethod
     def roll_4d6_drop_low():
@@ -38,3 +71,5 @@ class GeneratorPers:
                f'Разум | Шанс срабатывания магии | Внимательность | Воля | Торговля\n' \
                f'{self.mnd:^6}|{self.mnd_mgc:^25}|{self.mnd_prc:^16}|{self.mnd_wll:^6}|{self.mnd_trd:^12}\n'
 
+
+a = GeneratorPers('sd')
