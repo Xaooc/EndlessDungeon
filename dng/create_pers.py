@@ -1,6 +1,6 @@
 from random import randint
 
-from dng.pers import Pers
+from dng.database import Pers, Users, Place
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
