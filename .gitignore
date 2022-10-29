@@ -10,3 +10,4 @@ dng/__pycache__/creator_db.cpython-310.pyc
 /.idea/inspectionProfiles/profiles_settings.xml
 /dng/rpg.sqlite
 /.idea/vcs.xml
+/.idea/.gitignore
