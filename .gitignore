@@ -4,3 +4,9 @@ dng/__pycache__/place.cpython-310.pyc
 dng/__pycache__/pers.cpython-310.pyc
 dng/__pycache__/database.cpython-310.pyc
 dng/__pycache__/creator_db.cpython-310.pyc
+/.idea/EndlessDungeon.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/dng/rpg.sqlite
+/.idea/vcs.xml
