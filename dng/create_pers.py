@@ -1,6 +1,6 @@
 from random import randint
 
-from sqlalchemy.orm.util import identity_key
+from sqlalchemy import exists, select, update
 
 from dng.database import Chars, Users, Place, create_engine, DATABASE_NAME
 from sqlalchemy.orm import Session
@@ -33,6 +33,7 @@ class GeneratorPers:
             self.mnd,
             self.gold
         )
+
         session.add(new)
         session.commit()
         session.refresh(new)
@@ -42,7 +43,11 @@ class GeneratorPers:
             self.tg_id,
             active_pers
         )
-        session.add(user)
+        if not session.query(exists().where(Users.tg_id == self.tg_id)).scalar():
+            session.add(user)
+        else:
+            upd = session.execute(update(Users).where(Users.tg_id == self.tg_id).values(active_pers=active_pers))
+
         session.commit()
 
 
