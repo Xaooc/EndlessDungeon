@@ -25,7 +25,8 @@ async def send_welcome(message: types.Message):
             name = message.text
             new = GeneratorPers(name, tg_id=tg_id)
             await message.reply(f"Персонаж {name} создан!")
-    else: await message.answer("У вас есть персонаж!")
+    else:
+        await message.answer("У вас есть персонаж!")
 
 
 if __name__ == "__main__":
