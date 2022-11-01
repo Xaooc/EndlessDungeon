@@ -51,8 +51,6 @@ class GeneratorPers:
         session.commit()
 
 
-
-
     @staticmethod
     def roll_4d6_drop_low():
         roll = [randint(1, 6) for _ in range(4)]
