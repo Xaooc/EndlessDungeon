@@ -9,5 +9,7 @@ dng/__pycache__/creator_db.cpython-310.pyc
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
-dng/tkn.py
+/.dng/tkn.py
 
+/dng/tkn.py
+/rpg.sqlite
