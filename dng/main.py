@@ -1,34 +1,32 @@
-from aiogram import Bot, Dispatcher, executor, types
-from sqlalchemy import exists
+import asyncio
+
+from aiogram import Bot, Dispatcher, Router
+from aiogram.filters import Command
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import Message
+from aiogram_dialog import DialogRegistry
+
 
 from dng.tkn import API_TOKEN
-from dng.create_pers import GeneratorPers, Session
-import dng.database as db
+from dng.create_pers import GeneratorPers
 
 
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(storage=MemoryStorage())
+registry = DialogRegistry(dp)
+router = Router()
 
-engine = db.create_engine(f'sqlite:///{db.DATABASE_NAME}')
-session = Session(bind=engine)
 
-
-@dp.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
+@dp.message(Command(commands=["start"]))
+async def send_welcome(message: Message):
     tg_id = message.from_user.id
-    if not session.query(exists().where(db.Users.tg_id == tg_id)).scalar() or \
-            session.query(exists().where(db.Users.tg_id == tg_id)).where(db.Users.active_pers == 0).scalar():
-        await message.answer("Введите имя персонажа.")
-
-        @dp.message_handler()
-        async def new_char(message: types.Message):
-            name = message.text
-            new = GeneratorPers(name, tg_id=tg_id)
-            await message.reply(f"Персонаж {name} создан!")
-    else:
-        await message.answer("У вас есть персонаж!")
+    new = GeneratorPers(str(tg_id), tg_id)
+    await new.new()
 
 
-if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+async def main():
+    await dp.start_polling(bot)
 
+
+if __name__ == '__main__':
+    asyncio.run(main())

@@ -1,55 +1,21 @@
 from random import randint
-
-from sqlalchemy import exists, select, update
-
-from dng.database import Chars, Users, Place, create_engine, DATABASE_NAME
-from sqlalchemy.orm import Session
-
-
+from dng.database import UserData
 
 
 class GeneratorPers:
-
-    def __init__(self, name, exp=0,  tg_id=0):
+    def __init__(self, name: str, tg_id: int, exp: int = 0):
         self.name = name
         self.tg_id = tg_id
-
         self.exp = exp
-
         self.con = self.roll_4d6_drop_low()
         self.dex = self.roll_4d6_drop_low()
         self.mnd = self.roll_4d6_drop_low()
-
         self.gold = randint(1, 20)
 
-        engine = create_engine(f'sqlite:///{DATABASE_NAME}')
-        session = Session(bind=engine)
-
-        new = Chars(
-            self.name,
-            self.tg_id,
-            self.con,
-            self.dex,
-            self.mnd,
-            self.gold
-        )
-
-        session.add(new)
-        session.commit()
-        session.refresh(new)
-        active_pers = new.id
-
-        user = Users(
-            self.tg_id,
-            active_pers
-        )
-        if not session.query(exists().where(Users.tg_id == self.tg_id)).scalar():
-            session.add(user)
-        else:
-            upd = session.execute(update(Users).where(Users.tg_id == self.tg_id).values(active_pers=active_pers))
-
-        session.commit()
-
+    async def new(self):
+        new = UserData(tg_id=self.tg_id)
+        await new.new_char(name=self.name, exp=self.exp, con=self.con, dex=self.dex, mnd=self.mnd, gold=self.gold)
+        await new.create_char()
 
     @staticmethod
     def roll_4d6_drop_low():
