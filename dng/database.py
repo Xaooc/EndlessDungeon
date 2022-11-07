@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine, Table, MetaData, exists, update
+from sqlalchemy import create_engine, Table, MetaData, exists
 from sqlalchemy.orm import mapper, Session
 
 DATABASE_NAME = 'rpg.sqlite'
 
 engine = create_engine(f'sqlite:///{DATABASE_NAME}')
-
 meta = MetaData(engine)
+
 chars = Table('characters', meta, autoload=True)
 users = Table('users', meta, autoload=True)
 session = Session(bind=engine)
@@ -57,14 +57,16 @@ class UserData:
         self.exp = 0
 
     def is_user_created(self):
-        return session.query(exists().where(Users.tg_id == self.tg_id)).scalar()
+        return session.query(Users).where(Users.tg_id == self.tg_id).scalar()
 
     def user_char_upd(self):
-        session.execute(update(Users).where(Users.tg_id == self.tg_id).values(id_char=self.id_char))
+        user = session.query(Users).where(Users.tg_id == self.tg_id).one()
+        user.id_char = self.id_char
+        session.add(user)
+        session.commit()
         return ''
 
     async def create_char(self):
-        print(self.id_char)
         user = Users(self.tg_id, self.id_char)
         if not self.is_user_created():
             session.add(user)

@@ -1,4 +1,5 @@
 from random import randint
+
 from dng.database import UserData
 
 
@@ -18,7 +19,8 @@ class GeneratorPers:
         await new.create_char()
 
     @staticmethod
-    def roll_4d6_drop_low():
+    def roll_4d6_drop_low() -> int:
         roll = [randint(1, 6) for _ in range(4)]
         roll.remove(min(roll))
         return sum(roll)
+
