@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Table, MetaData, exists
+from sqlalchemy import create_engine, Table, MetaData
 from sqlalchemy.orm import mapper, Session
 
 DATABASE_NAME = 'rpg.sqlite'
@@ -75,7 +75,7 @@ class UserData:
         session.commit()
 
     async def is_user_active_char(self):
-        return session.query(exists().where(Users.tg_id == self.tg_id)).where(Users.active_pers == 0).scalar()
+        return session.query(Users).where(Users.tg_id == self.tg_id).where(Users.active_pers == 0).scalar()
 
     async def new_char(self, name: str, exp: int, con: int, dex: int, mnd: int, gold: int):
         self.name = name
