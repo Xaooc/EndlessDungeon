@@ -12,18 +12,17 @@ session = Session(bind=engine)
 
 
 class Chars:
-    def __init__(self, name: str, tg_id: int, exp: int, con: int, dex: int, mnd: int,
-                 gold: int, hp: int = 0, place: int = 0, items: str = '', is_dead: bool = False):
+    def __init__(self, name: str, tg_id: int, con: int, dex: int, mnd: int,
+                 gold: int, hp: int = 0, lvl: int = 0, place: int = 0, is_dead: bool = False):
         self.tg_id = tg_id
         self.name = name
         self.hp = hp
-        self.exp = exp
+        self.lvl = lvl
         self.con = con
         self.dex = dex
         self.mnd = mnd
         self.gold = gold
         self.place = place
-        self.items = items
         self.is_dead = is_dead
 
 
@@ -45,7 +44,6 @@ mapper(Chars, chars)
 
 
 class UserData:
-
     def __init__(self, tg_id: int):
         self.tg_id = tg_id
         self.id_char = 0
@@ -54,9 +52,8 @@ class UserData:
         self.dex = 0
         self.mnd = 0
         self.gold = 0
-        self.exp = 0
 
-    def is_user_created(self):
+    def is_user_created(self) -> bool:
         return session.query(Users).where(Users.tg_id == self.tg_id).scalar()
 
     def user_char_upd(self):
@@ -64,7 +61,6 @@ class UserData:
         user.id_char = self.id_char
         session.add(user)
         session.commit()
-        return ''
 
     async def create_char(self):
         user = Users(self.tg_id, self.id_char)
@@ -74,18 +70,17 @@ class UserData:
             self.user_char_upd()
         session.commit()
 
-    async def is_user_active_char(self):
-        return session.query(Users).where(Users.tg_id == self.tg_id).where(Users.active_pers == 0).scalar()
+    def is_user_active_char(self) -> bool:
+        return session.query(Users).where(Users.tg_id == self.tg_id).where(Users.id_char == 0).scalar()
 
-    async def new_char(self, name: str, exp: int, con: int, dex: int, mnd: int, gold: int):
+    async def new_char(self, name: str, con: int, dex: int, mnd: int, gold: int):
         self.name = name
         self.con = con
         self.dex = dex
         self.mnd = mnd
         self.gold = gold
-        self.exp = exp
 
-        new = Chars(self.name, self.tg_id, self.exp, self.con, self.dex, self.mnd, self.gold)
+        new = Chars(self.name, self.tg_id, self.con, self.dex, self.mnd, self.gold)
         session.add(new)
         session.commit()
         session.refresh(new)

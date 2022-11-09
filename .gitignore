@@ -11,5 +11,5 @@ dng/__pycache__/creator_db.cpython-310.pyc
 /.idea/vcs.xml
 /.dng/tkn.py
 
-/dng/tkn.py
+/tkn.py
 /rpg.sqlite
