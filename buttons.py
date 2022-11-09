@@ -1,4 +1,4 @@
-from aiogram.types import KeyboardButton
+from aiogram.types import KeyboardButton, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 yes = KeyboardButton(text="Да")
