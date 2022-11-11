@@ -16,8 +16,9 @@ async def new(message: Message, state: FSMContext):
     #записываем экземпляр, чтобы передавать между статусами
     user = UserData(tg_id=message.from_user.id)
     await state.update_data(user=user)
-    user_data = await state.get_data()
-    if user_data['user'].is_user_inactive_char():
+    if not user.is_user_created():
+        await user.create_char()
+    if user.is_user_inactive_char():
         await message.answer('Как зовут твоего персонажа?')
         await state.set_state(st.CreateChar.name)
     else:
@@ -42,6 +43,6 @@ async def name(message: Message, state: FSMContext):
 async def new_done(message: Message, state: FSMContext):
     char = GeneratorPers(message.text, message.from_user.id)
     await char.new()
-    await message.answer(f'Отныне звать его будут так. Чтобы посмотреть характеристику своего персонажа,'
+    await message.answer(f'Отныне звать его будут так. Чтобы посмотреть характеристики своего персонажа'
                          f' введи команду /char', reply_markup=bt.ReplyKeyboardRemove())
     await state.clear()
