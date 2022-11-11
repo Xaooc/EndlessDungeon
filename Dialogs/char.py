@@ -13,7 +13,7 @@ router = Router()
 async def char(message: Message, state: FSMContext):
     user = UserData(tg_id=message.from_user.id)
     #проверяем есть ли активный персонаж
-    if user.is_user_inactive_char():
+    if user.is_user_inactive_char() or not user.is_user_created():
         await message.answer('У тебя ещё нет активного персонажа. Создать его ты можешь с помощью команды /new')
     else:
         char = await user.get_char_name()
