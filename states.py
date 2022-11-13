@@ -12,3 +12,8 @@ class CreateChar(StatesGroup):
     name = State()
 
 
+class Go(StatesGroup):
+    start = State()
+    dung = State()
+    waiting = State()
+
