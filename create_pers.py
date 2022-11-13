@@ -1,4 +1,5 @@
 from random import randint
+from datetime import datetime
 
 from database import UserData
 
@@ -14,7 +15,8 @@ class GeneratorPers:
 
     async def new(self):
         new = UserData(tg_id=self.tg_id)
-        await new.new_char(name=self.name, con=self.con, dex=self.dex, mnd=self.mnd, gold=self.gold)
+        date = str(datetime.date(datetime.today()))
+        await new.new_char(name=self.name, con=self.con, dex=self.dex, mnd=self.mnd, gold=self.gold, date=date)
         await new.create_char()
 
     @staticmethod
