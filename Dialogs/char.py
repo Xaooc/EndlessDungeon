@@ -4,7 +4,7 @@ from aiogram.filters import Command
 from aiogram import Router
 
 from database import UserData
-
+import buttons as bt
 
 router = Router()
 
@@ -14,7 +14,8 @@ async def char(message: Message, state: FSMContext):
     user = UserData(tg_id=message.from_user.id)
     #проверяем есть ли активный персонаж
     if user.is_user_inactive_char() or not user.is_user_created():
-        await message.answer('У тебя ещё нет активного персонажа. Создать его ты можешь с помощью команды /new')
+        await message.answer('У тебя ещё нет активного персонажа. '
+                             'Создать его ты можешь с помощью команды /new', reply_markup=bt.ReplyKeyboardRemove())
     else:
         char = await user.get_char_name()
         name = char.get('name')
@@ -22,7 +23,8 @@ async def char(message: Message, state: FSMContext):
         dex = char.get('dex')
         mnd = char.get('mnd')
         gold = char.get('gold')
-        await message.answer(f'*Имя персонажа:* {name}\n'
+        hp = char.get('hp')
+        await message.answer(f'*Имя персонажа:* {name}  *Здоровье:* {hp}\n'
                              f'*Телосложение:* {con}  *Ловкость:* {dex}  *Мудрость:* {mnd}\n'
                              f'*Золото:* {gold}', parse_mode="MarkdownV2")
 
