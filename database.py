@@ -14,7 +14,7 @@ session = Session(bind=engine)
 # инициализируем классы таблиц
 class Chars:
     def __init__(self, name: str, tg_id: int, con: int, dex: int, mnd: int,
-                 gold: int, hp: int = 0, lvl: int = 0, place: int = 0, is_dead: bool = False):
+                 gold: int, date: str, hp: int = 0, lvl: int = 0, place: int = 0, is_dead: bool = False, found: bool = False):
         self.tg_id = tg_id
         self.name = name
         self.hp = hp
@@ -25,6 +25,8 @@ class Chars:
         self.gold = gold
         self.place = place
         self.is_dead = is_dead
+        self.found = found
+        self.date = date
 
 
 class Users:
@@ -84,7 +86,7 @@ class UserData:
         """
         return session.query(Users).where(Users.tg_id == self.tg_id).where(Users.id_char == 0).scalar()
 
-    async def new_char(self, name: str, con: int, dex: int, mnd: int, gold: int) -> None:
+    async def new_char(self, name: str, con: int, dex: int, mnd: int, gold: int, date: str) -> None:
         """
         Создание и запись нового персонажа в бд
         """
@@ -93,9 +95,9 @@ class UserData:
         self.dex = dex
         self.mnd = mnd
         self.gold = gold
-        self.max_hp = 10 + (self.con - 10) // 2
+        self.max_hp = (6 + (self.con - 10) // 2) * 2
 
-        new = Chars(self.name, self.tg_id, self.con, self.dex, self.mnd, self.gold, hp=self.max_hp)
+        new = Chars(self.name, self.tg_id, self.con, self.dex, self.mnd, self.gold, hp=self.max_hp, date=date)
         session.add(new)
         session.commit()
         session.refresh(new)
@@ -108,7 +110,10 @@ class UserData:
         user = session.query(Users).where(Users.tg_id == self.tg_id).one()
         self.id_char = user.id_char
         char = session.get(Chars, self.id_char)
-        return {'name': char.name, 'con': char.con, 'dex': char.dex, 'mnd': char.mnd, 'gold': char.gold}
+        self.con = char.con if char.con else 10
+        self.max_hp = (6 + (self.con - 10) // 2) * 2
+        return {'name': char.name, 'con': char.con, 'dex': char.dex,
+                'mnd': char.mnd, 'gold': char.gold, 'date': char.date, 'hp': char.hp}
 
     async def gold_mod(self, gold: int) -> None:
         """
@@ -121,33 +126,45 @@ class UserData:
         session.add(char)
         session.commit()
 
-    async def hp_mod(self, hp: int) -> None:
+    async def hp_mod(self, hp: int) -> bool:
         """
         Изменение кол-ва здоровья
         """
-        user = session.query(Users).where(Users.tg_id == self.tg_id).one()
-        self.id_char = user.id_char
+
+        await self.get_char_name()
         char = session.get(Chars, self.id_char)
-        char.hp += hp if (char.hp + hp) >= 0 else 0
-        if char.hp == 0:
-            pass
+        char.hp += hp
         if char.hp > self.max_hp:
             char.hp = self.max_hp
         session.add(char)
         session.commit()
+        if char.hp <= 0:
+            await self.update_dead()
+            return False
+        else:
+            return True
 
-    async def update_stats(self, status: int) -> None:
+    async def update_dead(self, is_dead: bool = True) -> None:
         """
-        Обновление статуса пользователя. Нужно для защиты от повторного вызова команды
+        При смерти персонажа
         """
-        user = session.query(Users).where(Users.tg_id == self.tg_id).one()
-        user.status = status
-        session.add(user)
+        char = session.get(Chars, self.id_char)
+        char.is_dead = is_dead
+        session.add(char)
+        session.commit()
+        self.id_char = 0
+        await self.user_char_upd()
+
+    async def update_place(self, place: int) -> None:
+        """
+        Обновление позиции персонажа
+        """
+        char = session.get(Chars, self.id_char)
+        char.place = place
+        session.add(char)
         session.commit()
 
-    async def get_user_status(self) -> int:
-        """
-        Получить статус пользователя
-        """
-        user = session.query(Users).where(Users.tg_id == self.tg_id).one()
-        return user.status
+
+
+
+
