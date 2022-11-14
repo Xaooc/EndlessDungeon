@@ -26,5 +26,5 @@ class Result:
                 'type': ''}
         }
 
-     async def get_result(self) -> dict:
+    async def get_result(self) -> dict:
         return self.result.get(self.res)
