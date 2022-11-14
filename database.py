@@ -13,8 +13,9 @@ session = Session(bind=engine)
 
 # инициализируем классы таблиц
 class Chars:
-    def __init__(self, name: str, tg_id: int, con: int, dex: int, mnd: int,
-                 gold: int, date: str, hp: int = 0, lvl: int = 0, place: int = 0, is_dead: bool = False, found: bool = False):
+    def __init__(self, name: str, tg_id: float, con: int, dex: int, mnd: int,
+                 gold: int, date: str, hp: int = 0, lvl: int = 0, place: int = 0,
+                 is_dead: bool = False, found: bool = False, res_hp: str = ''):
         self.tg_id = tg_id
         self.name = name
         self.hp = hp
@@ -27,10 +28,11 @@ class Chars:
         self.is_dead = is_dead
         self.found = found
         self.date = date
+        self.res_hp = res_hp
 
 
 class Users:
-    def __init__(self, tg_id: int, id_char: int, status: int = 0):
+    def __init__(self, tg_id: float, id_char: int, status: int = 0):
         self.status = status
         self.tg_id = tg_id
         self.id_char = id_char
@@ -44,7 +46,7 @@ mapper(Chars, chars)
 ###
 
 class UserData:
-    def __init__(self, tg_id: int):
+    def __init__(self, tg_id: float):
         self.max_hp = 0
         self.tg_id = tg_id
         self.id_char = 0
@@ -97,23 +99,24 @@ class UserData:
         self.gold = gold
         self.max_hp = (6 + (self.con - 10) // 2) * 2
 
-        new = Chars(self.name, self.tg_id, self.con, self.dex, self.mnd, self.gold, hp=self.max_hp, date=date)
+        new = Chars(self.name, self.tg_id, self.con, self.dex, self.mnd, self.gold, hp=self.max_hp, date=date, res_hp=date)
         session.add(new)
         session.commit()
         session.refresh(new)
         self.id_char = new.id
 
-    async def get_char_name(self) -> dict:
+    async def get_char(self) -> dict:
         """
         Получить характеристики персонажа из бд
         """
-        user = session.query(Users).where(Users.tg_id == self.tg_id).one()
-        self.id_char = user.id_char
+        user = session.query(Users).where(Users.tg_id == self.tg_id).first()
+        self.id_char = user.id_char if user.id_char else 0
         char = session.get(Chars, self.id_char)
         self.con = char.con if char.con else 10
         self.max_hp = (6 + (self.con - 10) // 2) * 2
+
         return {'name': char.name, 'con': char.con, 'dex': char.dex,
-                'mnd': char.mnd, 'gold': char.gold, 'date': char.date, 'hp': char.hp}
+                'mnd': char.mnd, 'gold': char.gold, 'date': char.date, 'hp': char.hp, 'res_hp': char.res_hp}
 
     async def gold_mod(self, gold: int) -> None:
         """
@@ -131,7 +134,7 @@ class UserData:
         Изменение кол-ва здоровья
         """
 
-        await self.get_char_name()
+        await self.get_char()
         char = session.get(Chars, self.id_char)
         char.hp += hp
         if char.hp > self.max_hp:
