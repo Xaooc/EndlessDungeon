@@ -16,17 +16,17 @@ ok = KeyboardButton(text=choice(ok_bt))
 
 kb_yesno = ReplyKeyboardBuilder().add(yes).add(no) \
     .as_markup(resize_keyboard=True, input_field_placeholder="У тебя уже есть персонаж. "
-                                                             "Хочешь создать нового?")
+                                                             "Хочешь создать нового?", selective=True)
 kb_back = ReplyKeyboardBuilder().add(back) \
-    .as_markup(resize_keyboard=True, input_field_placeholder="Как будут звать твоего нового персонажа?")
+    .as_markup(resize_keyboard=True, input_field_placeholder="Как будут звать твоего нового персонажа?", selective=True)
 kb_go = ReplyKeyboardBuilder().add(go).add(back) \
-    .as_markup(resize_keyboard=True, input_field_placeholder="Вы точно хотите спуститься в подземелье?")
+    .as_markup(resize_keyboard=True, input_field_placeholder="Вы точно хотите спуститься в подземелье?", selective=True)
 kb_ok = ReplyKeyboardBuilder().add(ok) \
-    .as_markup(resize_keyboard=True, input_field_placeholder="Продолжим?")
+    .as_markup(resize_keyboard=True, input_field_placeholder="Продолжим?", selective=True)
 
 
 def room_kb(events: list):
     first_event = KeyboardButton(text=events[0])
     second_event = KeyboardButton(text=events[1])
     return ReplyKeyboardBuilder().add(first_event).add(second_event) \
-        .as_markup(resize_keyboard=True, input_field_placeholder="Что будете делать?")
+        .as_markup(resize_keyboard=True, input_field_placeholder="Что будете делать?", selective=True)
